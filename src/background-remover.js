@@ -7,20 +7,22 @@ import { getKey } from 'polotno/utils/validate-key';
 import { useCredits } from './credits';
 import { useProject } from './project';
 
-let removeBackgroundFunc = async (url) => {
+let removeBackgroundFunc = async ( url ) =>
+{
   const req = await fetch(
     'https://api.polotno.com/api/remove-image-background-hotpot?KEY=' +
-      getKey(),
+    getKey(),
     {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ url }),
+      body: JSON.stringify( { url } ),
     }
   );
-  if (req.status !== 200) {
-    alert(t('error.removeBackground'));
+  if ( req.status !== 200 )
+  {
+    alert( t( 'error.removeBackground' ) );
     return url;
   }
   const res = await req.json();
@@ -28,55 +30,64 @@ let removeBackgroundFunc = async (url) => {
 };
 
 export const RemoveBackgroundDialog = observer(
-  ({ isOpen, onClose, element }) => {
+  ( { isOpen, onClose, element } ) =>
+  {
     const project = useProject();
-    const [src, setSrc] = React.useState(element.src);
+    const [ src, setSrc ] = React.useState( element.src );
     const { credits, consumeCredits } = useCredits(
       'removeBackgroundCredits',
       5
     );
 
-    React.useEffect(() => {
-      setSrc(element.src);
-    }, [element.src]);
+    React.useEffect( () =>
+    {
+      setSrc( element.src );
+    }, [ element.src ] );
 
-    const [removing, setRemoving] = React.useState(false);
+    const [ removing, setRemoving ] = React.useState( false );
 
-    const [progress, setProgress] = React.useState(0);
+    const [ progress, setProgress ] = React.useState( 0 );
 
-    React.useEffect(() => {
-      if (!isOpen || !removing) {
-        setProgress(0);
+    React.useEffect( () =>
+    {
+      if ( !isOpen || !removing )
+      {
+        setProgress( 0 );
         return;
       }
       const averageTime = 30000;
       const steps = 95;
       const stepTime = averageTime / steps;
-      const interval = setInterval(() => {
-        setProgress((progress) => progress + 1);
-      }, stepTime);
-      return () => clearInterval(interval);
-    }, [isOpen, removing]);
+      const interval = setInterval( () =>
+      {
+        setProgress( ( progress ) => progress + 1 );
+      }, stepTime );
+      return () => clearInterval( interval );
+    }, [ isOpen, removing ] );
 
-    const handleRemove = async () => {
-      setRemoving(true);
-      try {
-        setSrc(await removeBackgroundFunc(element.src));
+    const handleRemove = async () =>
+    {
+      setRemoving( true );
+      try
+      {
+        setSrc( await removeBackgroundFunc( element.src ) );
         consumeCredits();
-      } catch (e) {
-        console.error(e);
+      } catch ( e )
+      {
+        console.error( e );
       }
 
-      setRemoving(false);
+      setRemoving( false );
     };
 
     const finished = src !== element.src;
 
     const moreButton = (
       <a
-        onClick={() => {
+        onClick={ () =>
+        {
           project.puterModalVisible = true;
-        }}
+        } }
         href="#"
       >
         Need more?
@@ -86,73 +97,72 @@ export const RemoveBackgroundDialog = observer(
     return (
       <Dialog
         // icon="info-sign"
-        onClose={onClose}
+        onClose={ onClose }
         title="Remove background from image"
-        isOpen={isOpen}
-        style={{
+        isOpen={ isOpen }
+        style={ {
           width: '80%',
           maxWidth: '700px',
-        }}
+        } }
       >
-        <div className={Classes.DIALOG_BODY}>
+        <div className={ Classes.DIALOG_BODY }>
           <img
-            src={src}
-            style={{ width: '100%', maxHeight: '400px', objectFit: 'contain' }}
+            src={ src }
+            style={ { width: '100%', maxHeight: '400px', objectFit: 'contain' } }
           />
         </div>
-        <div className={Classes.DIALOG_FOOTER} style={{ position: 'relative' }}>
-          <div style={{ position: 'absolute', top: '5px' }}>
-            Powered by{' '}
-            <a href="https://hotpot.ai/" target="_blank">
-              hotpot.ai
-            </a>
+        <div className={ Classes.DIALOG_FOOTER } style={ { position: 'relative' } }>
+          <div style={ { position: 'absolute', top: '5px' } }>
+
           </div>
-          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <div style={{ padding: '5px' }}>
-              {removing && <span>{progress}%</span>}
-              {!removing && !!credits && (
+          <div className={ Classes.DIALOG_FOOTER_ACTIONS }>
+            <div style={ { padding: '5px' } }>
+              { removing && <span>{ progress }%</span> }
+              { !removing && !!credits && (
                 <div>
-                  You have {credits} credits. {moreButton}
+
                 </div>
-              )}
-              {!removing && !credits && (
+              ) }
+              { !removing && !credits && (
                 <div>
-                  You have no credits. They will renew tomorrow. {moreButton}
+                  You have no credits. They will renew tomorrow. { moreButton }
                 </div>
-              )}
+              ) }
             </div>
-            {!finished && (
+            { !finished && (
               <Button
-                onClick={handleRemove}
-                loading={removing}
-                disabled={credits < 1}
+                onClick={ handleRemove }
+                loading={ removing }
+                disabled={ credits < 1 }
               >
-                {t('toolbar.removeBackground')}
+                { t( 'toolbar.removeBackground' ) }
               </Button>
-            )}
-            {finished && (
+            ) }
+            { finished && (
               <>
                 <Button
-                  onClick={() => {
-                    setSrc(element.src);
+                  onClick={ () =>
+                  {
+                    setSrc( element.src );
                     onClose();
-                  }}
-                  loading={removing}
+                  } }
+                  loading={ removing }
                 >
-                  {t('toolbar.cancelRemoveBackground')}
+                  { t( 'toolbar.cancelRemoveBackground' ) }
                 </Button>
                 <Button
-                  onClick={() => {
-                    element.set({ src });
+                  onClick={ () =>
+                  {
+                    element.set( { src } );
                     onClose();
-                  }}
-                  loading={removing}
+                  } }
+                  loading={ removing }
                   intent="primary"
                 >
-                  {t('toolbar.confirmRemoveBackground')}
+                  { t( 'toolbar.confirmRemoveBackground' ) }
                 </Button>
               </>
-            )}
+            ) }
           </div>
         </div>
       </Dialog>
@@ -160,23 +170,26 @@ export const RemoveBackgroundDialog = observer(
   }
 );
 
-export const ImageRemoveBackground = ({ element }) => {
-  const [removeDialogOpen, toggleDialog] = React.useState(false);
+export const ImageRemoveBackground = ( { element } ) =>
+{
+  const [ removeDialogOpen, toggleDialog ] = React.useState( false );
   return (
     <>
       <Button
-        text={t('toolbar.removeBackground')}
+        text={ t( 'toolbar.removeBackground' ) }
         minimal
-        onClick={(e) => {
-          toggleDialog(true);
-        }}
+        onClick={ ( e ) =>
+        {
+          toggleDialog( true );
+        } }
       />
       <RemoveBackgroundDialog
-        isOpen={removeDialogOpen}
-        onClose={() => {
-          toggleDialog(false);
-        }}
-        element={element}
+        isOpen={ removeDialogOpen }
+        onClose={ () =>
+        {
+          toggleDialog( false );
+        } }
+        element={ element }
       />
     </>
   );
